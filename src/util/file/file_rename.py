@@ -25,6 +25,7 @@ from util.file.mp3_file_info import *
 files_ext_filter = '.mp3' #只筛选出.py文件
 files_json_file = 'imgs.json'
 albums_json_file = 'albums.json'
+prefix = 'fm'
 
 print('***获取当前目录***')
 path = "/Users/fred/Desktop/mp3" #os.getcwd()
@@ -42,7 +43,7 @@ for path,dir_list,file_list in g:
 for f in files:
     #print(f)
     name = get_file_name(f)
-    if(name.startswith("fm")):
+    if(name.startswith(prefix)):
         continue
     duration = get_mp3_duration(f)
     length = int(get_file_size(f) * 1024 * 1024)
@@ -51,6 +52,6 @@ for f in files:
     #print(length)
     #print(md5hash)
     #print(name)
-    dstDir = get_file_root_path(f) +"fm" + name + "_" + str(length) + "_" + str(duration) + "." + get_file_ext(f)
+    dstDir = get_file_root_path(f) +prefix + name + "_" + str(length) + "_" + str(duration) + "." + get_file_ext(f)
     print(dstDir)
     os.rename(f, dstDir)
