@@ -16,7 +16,7 @@ def get_file_size(filePath:str):
     #filePath = unicode(filePath,'utf8')
     fsize = os.path.getsize(filePath)
     fsize = fsize/float(1024*1024)
-    print(fsize)
+    #print(fsize)
     return round(fsize,2)
 
 def get_file_ext(filePath:str):
@@ -36,6 +36,9 @@ def get_file_name(filePath:str):
     :return:
     '''
     return filePath[filePath.rindex('/') + 1:filePath.rindex('.') ]
+
+def get_file_root_path(filePath:str):
+    return filePath[0:filePath.rindex('/')+1 ]
 
 def get_file_sha1hash(filepath):
     with open(filepath,'rb') as f:
