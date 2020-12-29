@@ -6,6 +6,10 @@
 @DateTime : 2020/11/5 09:33
 @Author : fangqing.fan#hotmail.com
 
+#依赖安装
+pip3 install mutagen
+pip3 install qiniu
+
 用于podcast音频文件整理
 源文件：003.mp3
 重命名后的文件：fm003_8776581_2192.mp3
