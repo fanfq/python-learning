@@ -23,6 +23,7 @@ https://developer.qiniu.com/kodo/sdk/1242/python#3
 增加了cdn直接上传功能，文件从命名完成后直接上传cdn并返回最终url
 """
 
+import sys
 import os
 from mutagen.mp3 import MP3
 import hashlib
@@ -119,6 +120,13 @@ def get_file_sha1hash(filepath):
         hash = sha1obj.hexdigest()
         return hash
 
+'''
+eg: 2020-12-30
+:return:
+'''
+def get_date_today():
+    today = datetime.date.today()
+    return today
 
 def get_file_md5hash(filepath):
     with open(filepath, 'rb') as f:
@@ -133,34 +141,78 @@ if __name__ == '__main__':
     path = os.getcwd()
     print(path)
 
-    # 根据目录遍历该目录的文件
+    #根据目录遍历该目录的文件,其中包含子目录
+    '''
+    os.walk的函数声明为:
+    walk(top, topdown=True, onerror=None, followlinks=False)
+    参数：
+        top 是你所要便利的目录的地址
+        topdown 为真，则优先遍历top目录，否则优先遍历top的子目录(默认为开启)
+        onerror 需要一个 callable 对象，当walk需要异常时，会调用
+        followlinks 如果为真，则会遍历目录下的快捷方式(linux 下是 symbolic link)实际所指的目录(默认关闭)
+        os.walk 的返回值是一个生成器(generator),也就是说我们需要不断的遍历它，来获得所有的内容。
+        每次遍历的对象都是返回的是一个三元组(root,dirs,files)
+        root 所指的是当前正在遍历的这个文件夹的本身的地址
+        dirs 是一个 list ，内容是该文件夹中所有的目录的名字(包括子目录)
+        files 同样是 list , 内容是该文件夹中所有的文件(包括子目录的文件)
+    '''
     g = os.walk(path)
     files = []
-    for path, dir_list, file_list in g:
-        for file_name in file_list:
-            file_ = os.path.join(path, file_name)
-            if (file_.upper().endswith(files_ext_filter.upper())):
-                files.append(file_)
+
+    #该目录下的，所有文件，其中包含子目录
+    #for root,dir_list,file_list in g:
+    #    for file_name in file_list:
+    #        file_ = os.path.join(root, file_name)
+    #        if(file_.upper().endswith(files_ext_filter.upper())):
+    #            files.append(file_)
+
+    #该目录下的，所有文件，其中不包含子目录
+    for root,dir_list,file_list in g:
+        if root == path: #只包含当前目录，排除子目录
+            for file_name in file_list:
+                file_ = os.path.join(root, file_name)
+                #根据文件扩展名过滤
+                if(file_.upper().endswith(files_ext_filter.upper())):
+                    files.append(file_)
+
+    #sys.exit()
 
     for f in files:
-
+        
         name = get_file_name(f)
-        if (name.startswith(prefix)):
+        #根据文件名前缀过滤
+        if(name.startswith(prefix)):
             continue
-        duration = get_mp3_duration(f)
-        length = int(get_file_size(f) * 1024 * 1024)
-        # md5hash = get_file_md5hash(f)
-        # print(duration)
-        # print(length)
-        # print(md5hash)
-        # print(name)
-        print("src:", f)
-        newName = prefix + name + "_" + str(length) + "_" + str(duration) + "." + get_file_ext(f)
-        dstFilePath = get_file_root_path(f) + newName
-        print('newName:', newName)
-        print('dstFilePath:', dstFilePath)
-        os.rename(f, dstFilePath)
+        #duration = get_mp3_duration(f)
+        #length = int(get_file_size(f) * 1024 * 1024)
+        md5hash = get_file_md5hash(f)
+        #print(duration)
+        #print(length)
+        #print(md5hash)
+        #print(name)
+        #print("src:",f)
 
-        # 上传至cdn
-        upload_to_qiniu(dstFilePath, newName)
+        #newName = prefix + name + "_" + str(length) + "_" + str(duration) + "." + get_file_ext(f)
+        #dstFilePath = get_file_root_path(f) + newName
+        #print('newName:',newName)
+        #print('dstFilePath:',dstFilePath)
+        #os.rename(f, dstFilePath)
+
+        #新文件名以hacode命名，目录名则是当天日期 yyyy-mm-dd
+        #mov 至新目录，并删除原文件。当在mov发现重名文件则替换从而排重
+        newName = md5hash+"."+get_file_ext(f)
+        dstPath = get_file_root_path(f) + str(get_date_today())
+        #目录不存在则创建
+        if not os.path.exists(dstPath):
+            os.makedirs(dstPath)
+        dstFilePath = os.path.join(dstPath, newName)
+        print('newName:',newName)
+        print('dstFilePath:',dstFilePath)
+        os.rename(f, dstFilePath)
+        
+
+        #上传至cdn
+        #upload_to_qiniu(dstFilePath,newName)
+
+
 
