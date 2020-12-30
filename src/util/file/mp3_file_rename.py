@@ -178,7 +178,7 @@ if __name__ == '__main__':
     #sys.exit()
 
     for f in files:
-        
+        #******************************************************
         name = get_file_name(f)
         #根据文件名前缀过滤
         if(name.startswith(prefix)):
@@ -192,12 +192,14 @@ if __name__ == '__main__':
         #print(name)
         #print("src:",f)
 
+        #******************************************************
         #newName = prefix + name + "_" + str(length) + "_" + str(duration) + "." + get_file_ext(f)
         #dstFilePath = get_file_root_path(f) + newName
         #print('newName:',newName)
         #print('dstFilePath:',dstFilePath)
         #os.rename(f, dstFilePath)
 
+        #******************************************************
         #新文件名以hacode命名，目录名则是当天日期 yyyy-mm-dd
         #mov 至新目录，并删除原文件。当在mov发现重名文件则替换从而排重
         newName = md5hash+"."+get_file_ext(f)
@@ -210,7 +212,7 @@ if __name__ == '__main__':
         print('dstFilePath:',dstFilePath)
         os.rename(f, dstFilePath)
         
-
+        #******************************************************
         #上传至cdn
         #upload_to_qiniu(dstFilePath,newName)
 
